@@ -1,55 +1,38 @@
-This file is part of MXE. See LICENSE.md for licensing information.
-
-Contains ad hoc patches for cross building.
-
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: xantares <xantares09@hotmail.com>
-Date: Mon, 28 Sep 2015 08:21:42 +0000
-Subject: [PATCH 1/1] Fix {make,jump}_fcontext visibility with mingw
-
-taken from: https://github.com/boostorg/context/pull/22
-
-diff --git a/libs/context/src/asm/jump_i386_ms_pe_gas.asm b/libs/context/src/asm/jump_i386_ms_pe_gas.asm
-index 1111111..2222222 100644
---- a/libs/context/src/asm/jump_i386_ms_pe_gas.asm
-+++ b/libs/context/src/asm/jump_i386_ms_pe_gas.asm
-@@ -138,3 +138,6 @@ _jump_fcontext:
+diff -ur a/boost/thread/win32/basic_timed_mutex.hpp b/boost/thread/win32/basic_timed_mutex.hpp
+--- a/boost/thread/win32/basic_timed_mutex.hpp	2017-12-14 00:56:49.000000000 +0100
++++ b/boost/thread/win32/basic_timed_mutex.hpp	2018-01-29 18:43:25.615734914 +0100
+@@ -23,6 +23,7 @@
+ #include <boost/chrono/ceil.hpp>
+ #endif
+ #include <boost/config/abi_prefix.hpp>
++#include <boost/winapi/wait.hpp>
  
-     /* indirect jump to context */
-     jmp  *%edx
-+
-+.section .drectve
-+.ascii " -export:\"jump_fcontext\""
-diff --git a/libs/context/src/asm/jump_x86_64_ms_pe_gas.asm b/libs/context/src/asm/jump_x86_64_ms_pe_gas.asm
-index 1111111..2222222 100644
---- a/libs/context/src/asm/jump_x86_64_ms_pe_gas.asm
-+++ b/libs/context/src/asm/jump_x86_64_ms_pe_gas.asm
-@@ -223,3 +223,6 @@ jump_fcontext:
-     /* indirect jump to context */
-     jmp  *%r10
- .seh_endproc
-+
-+.section .drectve
-+.ascii " -export:\"jump_fcontext\""
-diff --git a/libs/context/src/asm/make_i386_ms_pe_gas.asm b/libs/context/src/asm/make_i386_ms_pe_gas.asm
-index 1111111..2222222 100644
---- a/libs/context/src/asm/make_i386_ms_pe_gas.asm
-+++ b/libs/context/src/asm/make_i386_ms_pe_gas.asm
-@@ -122,3 +122,6 @@ finish:
-     hlt
+ namespace boost
+ {
+@@ -81,7 +82,7 @@
  
- .def	__exit;	.scl	2;	.type	32;	.endef  /* standard C library function */
-+
-+.section .drectve
-+.ascii " -export:\"make_fcontext\""
-diff --git a/libs/context/src/asm/make_x86_64_ms_pe_gas.asm b/libs/context/src/asm/make_x86_64_ms_pe_gas.asm
-index 1111111..2222222 100644
---- a/libs/context/src/asm/make_x86_64_ms_pe_gas.asm
-+++ b/libs/context/src/asm/make_x86_64_ms_pe_gas.asm
-@@ -149,3 +149,6 @@ finish:
- .seh_endproc
+                     do
+                     {
+-                        unsigned const retval(winapi::WaitForSingleObjectEx(sem, ::boost::detail::win32::infinite,0));
++                        unsigned const retval(::boost::winapi::WaitForSingleObjectEx(sem, ::boost::detail::win32::infinite,0));
+                         BOOST_VERIFY(0 == retval || ::boost::detail::win32::wait_abandoned == retval);
+ //                        BOOST_VERIFY(winapi::WaitForSingleObject(
+ //                                         sem,::boost::detail::win32::infinite)==0);
+@@ -142,7 +143,7 @@
  
- .def	_exit;	.scl	2;	.type	32;	.endef  /* standard C library function */
-+
-+.section .drectve
-+.ascii " -export:\"make_fcontext\""
+                     do
+                     {
+-                        if(winapi::WaitForSingleObjectEx(sem,::boost::detail::get_milliseconds_until(wait_until),0)!=0)
++                        if(::boost::winapi::WaitForSingleObjectEx(sem,::boost::detail::get_milliseconds_until(wait_until),0)!=0)
+                         {
+                             BOOST_INTERLOCKED_DECREMENT(&active_count);
+                             return false;
+@@ -210,7 +211,7 @@
+                       }
+                       chrono::milliseconds rel_time= chrono::ceil<chrono::milliseconds>(tp-now);
+ 
+-                      if(winapi::WaitForSingleObjectEx(sem,static_cast<unsigned long>(rel_time.count()),0)!=0)
++                      if(::boost::winapi::WaitForSingleObjectEx(sem,static_cast<unsigned long>(rel_time.count()),0)!=0)
+                       {
+                           BOOST_INTERLOCKED_DECREMENT(&active_count);
+                           return false;

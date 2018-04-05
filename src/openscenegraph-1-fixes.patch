@@ -73,22 +73,6 @@ been deprecated for 3+ years.
 See https://github.com/mxe/mxe/issues/1230#issuecomment-186936198
 Source of patch: http://forum.openscenegraph.org/viewtopic.php?t=10485
 
-diff --git a/src/osgPlugins/CMakeLists.txt b/src/osgPlugins/CMakeLists.txt
-index 1111111..2222222 100644
---- a/src/osgPlugins/CMakeLists.txt
-+++ b/src/osgPlugins/CMakeLists.txt
-@@ -199,10 +199,6 @@ IF(XINE_FOUND)
-     ADD_PLUGIN_DIRECTORY(xine)
- ENDIF()
- 
--IF(FFMPEG_FOUND AND OSG_CPP_EXCEPTIONS_AVAILABLE)
--    ADD_PLUGIN_DIRECTORY(ffmpeg)
--ENDIF()
--
- IF(GSTREAMER_FOUND AND GLIB_FOUND)
-     ADD_PLUGIN_DIRECTORY(gstreamer)
- ENDIF()
-
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Boris Pek <tehnick-8@yandex.ru>
 Date: Thu, 14 Dec 2017 15:29:38 +0300
@@ -122,83 +106,3 @@ index 1111111..2222222 100644
      SET(TARGET_LIBRARIES_VARS
          OPENVRML_LIBRARY)
 
-diff --git a/CMakeModules/FindGTA.cmake b/CMakeModules/FindGTA.cmake
-index 086069c32..53f73d895 100644
---- a/CMakeModules/FindGTA.cmake
-+++ b/CMakeModules/FindGTA.cmake
-@@ -18,40 +18,37 @@ IF(PKG_CONFIG_FOUND)
- 
- ENDIF(PKG_CONFIG_FOUND)
- 
--IF(NOT GTA_FOUND)
--    FIND_PATH(GTA_INCLUDE_DIRS gta/gta.hpp
--        $ENV{GTA_DIR}/include
--        $ENV{GTA_DIR}
--        ~/Library/Frameworks
--        /Library/Frameworks
--        /usr/local/include
--        /usr/include
--        /sw/include # Fink
--        /opt/local/include # DarwinPorts
--        /opt/csw/include # Blastwave
--        /opt/include
--        /usr/freeware/include
--    )
--    
--    FIND_LIBRARY(GTA_LIBRARY
--        NAMES gta libgta
--        PATHS
--        $ENV{GTA_DIR}/lib
--        $ENV{GTA_DIR}
--        ~/Library/Frameworks
--        /Library/Frameworks
--        /usr/local/lib
--        /usr/lib
--        /sw/lib
--        /opt/local/lib
--        /opt/csw/lib
--        /opt/lib
--        /usr/freeware/lib64
--    )
--    
--    SET(GTA_FOUND "NO")
--    IF(GTA_LIBRARY AND GTA_INCLUDE_DIRS)
--        SET(GTA_FOUND "YES")
--    ENDIF(GTA_LIBRARY AND GTA_INCLUDE_DIRS)
--
--ENDIF(NOT GTA_FOUND)
-\ No newline at end of file
-+FIND_PATH(GTA_INCLUDE_DIRS gta/gta.hpp
-+    $ENV{GTA_DIR}/include
-+    $ENV{GTA_DIR}
-+    ~/Library/Frameworks
-+    /Library/Frameworks
-+    /usr/local/include
-+    /usr/include
-+    /sw/include # Fink
-+    /opt/local/include # DarwinPorts
-+    /opt/csw/include # Blastwave
-+    /opt/include
-+    /usr/freeware/include
-+)
-+
-+FIND_LIBRARY(GTA_LIBRARY
-+    NAMES gta libgta
-+    PATHS
-+    $ENV{GTA_DIR}/lib
-+    $ENV{GTA_DIR}
-+    ~/Library/Frameworks
-+    /Library/Frameworks
-+    /usr/local/lib
-+    /usr/lib
-+    /sw/lib
-+    /opt/local/lib
-+    /opt/csw/lib
-+    /opt/lib
-+    /usr/freeware/lib64
-+)
-+
-+SET(GTA_FOUND "NO")
-+IF(GTA_LIBRARY AND GTA_INCLUDE_DIRS)
-+  SET(GTA_FOUND "YES")
-+ENDIF(GTA_LIBRARY AND GTA_INCLUDE_DIRS)
